@@ -8,6 +8,7 @@ import android.graphics.PointF
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -37,6 +38,10 @@ class DialView @JvmOverloads constructor(context: Context,
     private var fanSpeed = FanSpeed.OFF
     private val pointPosition: PointF = PointF(0.0f, 0.0f)
 
+    private var fanSpeedColorLow = 0
+    private var fanSpeedColorMedium = 0
+    private var fanSpeedColorHigh = 0
+
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
@@ -45,6 +50,12 @@ class DialView @JvmOverloads constructor(context: Context,
     }
 
     init {
+        context.withStyledAttributes(attrs, R.styleable.DialView) {
+         fanSpeedColorLow = getColor(R.styleable.DialView_dv_fan_color_1, 0)
+         fanSpeedColorMedium = getColor(R.styleable.DialView_dv_fan_color_2, 0)
+         fanSpeedColorHigh = getColor(R.styleable.DialView_dv_fan_color_3, 0)
+        }
+
         isClickable = true
     }
 
@@ -54,7 +65,12 @@ class DialView @JvmOverloads constructor(context: Context,
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        paint.color = if (fanSpeed == FanSpeed.OFF) Color.GRAY else Color.GREEN
+        paint.color = when (fanSpeed) {
+            FanSpeed.OFF -> Color.GRAY
+            FanSpeed.LOW -> fanSpeedColorLow
+            FanSpeed.MEDIUM -> fanSpeedColorMedium
+            FanSpeed.HIGH -> fanSpeedColorHigh
+        }
         // Draw the dial.
         canvas?.drawCircle((width/2).toFloat(), (height/2).toFloat(), radius, paint)
 
