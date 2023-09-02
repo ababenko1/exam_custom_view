@@ -19,7 +19,14 @@ private enum class FanSpeed(val label: Int) {
     OFF(R.string.fan_off),
     LOW(R.string.fan_low),
     MEDIUM(R.string.fan_medium),
-    HIGH(R.string.fan_high)
+    HIGH(R.string.fan_high);
+
+    fun next() = when(this) {
+       OFF -> LOW
+       LOW -> MEDIUM
+       MEDIUM -> HIGH
+       HIGH -> OFF
+    }
 }
 
 class DialView @JvmOverloads constructor(context: Context,
@@ -37,8 +44,12 @@ class DialView @JvmOverloads constructor(context: Context,
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
+    init {
+        isClickable = true
+    }
+
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
-        radius = (min(width, height)/2.0 * 0.7).toFloat()
+        radius = (min(width, height)/2.0 * 0.8).toFloat()
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -69,5 +80,12 @@ class DialView @JvmOverloads constructor(context: Context,
         y = (radius * sin(angle)).toFloat() + height/2
     }
 
+    override fun performClick(): Boolean {
+        if (super.performClick()) return true
 
+        fanSpeed = fanSpeed.next()
+        contentDescription = resources.getString(fanSpeed.label)
+        invalidate()
+        return true
+    }
 }
