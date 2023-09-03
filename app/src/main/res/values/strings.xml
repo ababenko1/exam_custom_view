@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">exam_custom_view</string>
     <string name="fan_off">Off</string>
     <string name="fan_low">1</string>

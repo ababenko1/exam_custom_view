@@ -9,6 +9,9 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.withStyledAttributes
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -56,7 +59,25 @@ class DialView @JvmOverloads constructor(context: Context,
          fanSpeedColorHigh = getColor(R.styleable.DialView_dv_fan_color_3, 0)
         }
 
+        updateContentDescription()
+
         isClickable = true
+
+        ViewCompat.setAccessibilityDelegate(this, object: AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(
+                host: View,
+                info: AccessibilityNodeInfoCompat
+            ) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                val customClick = AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_CLICK,
+                    if (fanSpeed == FanSpeed.HIGH) "Reset"
+                    else "Change"
+                )
+                info.addAction(customClick)
+            }
+
+        })
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -101,7 +122,12 @@ class DialView @JvmOverloads constructor(context: Context,
 
         fanSpeed = fanSpeed.next()
         contentDescription = resources.getString(fanSpeed.label)
+        updateContentDescription()
         invalidate()
         return true
+    }
+
+    private fun updateContentDescription() {
+        contentDescription = resources.getString(fanSpeed.label)
     }
 }
